@@ -87,18 +87,22 @@ module TicTacToe
       @current_player_id = other_player_id
     end
  
+#  current player is current player id
     def current_player
       @players[current_player_id]
     end
  
+#  opponent player is other player id
     def opponent
       @players[other_player_id]
     end
  
+#  i guess it is always 10 minus how many free positions on the board
     def turn_num
       10 - free_positions.size
     end
  
+#  display information
     def print_board
       col_separator, row_separator = " | ", "--+---+--"
       label_for_position = lambda{|position| @board[position] ? @board[position] : position}
@@ -110,20 +114,29 @@ module TicTacToe
     end
   end
  
+#  initalize with game & marker paramaters
   class Player
     def initialize(game, marker)
       @game = game
       @marker = marker
     end
+#     read only instance variable?
     attr_reader :marker
   end
  
+=begin
+ http://stackoverflow.com/questions/612189/why-are-exclamation-marks-used-in-ruby-methods
+  In general, methods that end in ! indicate that the method will modify the object it's called on. 
+  Ruby calls these "dangerous methods" because they change state that someone else might have a reference to. 
+=end
   class HumanPlayer < Player
     def select_position!
       @game.print_board
       loop do
         print "Select your #{marker} position: "
+#         convert selection to int
         selection = gets.to_i
+#         if not in free position tell user
         return selection if @game.free_positions.include?(selection)
         puts "Position #{selection} is not available. Try again."
       end
