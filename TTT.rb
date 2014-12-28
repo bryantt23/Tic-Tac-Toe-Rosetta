@@ -1,60 +1,88 @@
 require 'set'
  
 module TicTacToe
+#   looks like these are the winning positions
   LINES = [[1,2,3],[4,5,6],[7,8,9],[1,4,7],[2,5,8],[3,6,9],[1,5,9],[3,5,7]]
  
   class Game
+#     initialize taking player 1 & 2 class as parameters
     def initialize(player_1_class, player_2_class)
       @board = Array.new(10) # we ignore index 0 for convenience
  
       @current_player_id = 0
+#       makes first player x, second player 0
       @players = [player_1_class.new(self, "X"), player_2_class.new(self, "O")]
+
+# displays that the current player goes first
       puts "#{current_player} goes first."
     end
+#     http://stackoverflow.com/questions/5046831/why-use-rubys-attr-accessor-attr-reader-and-attr-writer
+#   can only read the board & current player id, instance variable
     attr_reader :board, :current_player_id
  
+#  play method
     def play
       loop do
+#         current player gets the player marker
         place_player_marker(current_player)
  
+#  show that the current player has won and print board
         if player_has_won?(current_player)
           puts "#{current_player} wins!"
           print_board
           return
+#           if no winner & board is full, display it is a draw & print board 
         elsif board_full?
           puts "It's a draw."
           print_board
           return
         end
  
+#  switch players
         switch_players!
       end
     end
  
+#  free positions method
     def free_positions
+#       1 through 9 inclusive are available
+# select it if it is available?
       Set.new((1..9).select {|position| @board[position].nil?})
     end
  
+#  place marker
+#the position is where the player has selected
     def place_player_marker(player)
       position = player.select_position!
+      
+#       display which player & which position has been selected
       puts "#{player} selects #{player.marker} position #{position}"
+      
+#       mark the board position by the player
       @board[position] = player.marker
     end
  
+#  if the player has any of the winning positions aka lines
+# if any of the lines has been marked by the player
     def player_has_won?(player)
       LINES.any? do |line|
         line.all? {|position| @board[position] == player.marker}
       end
     end
  
+#  full board if 
     def board_full?
+#       http://stackoverflow.com/questions/885414/a-concise-explanation-of-nil-v-empty-v-blank-in-ruby-on-rails
+# if free positions has no elements
       free_positions.empty?
     end
  
+#  one player gets id 0, other id 1
     def other_player_id
       1 - @current_player_id
     end
  
+#  current player becomes other player
     def switch_players!
       @current_player_id = other_player_id
     end
